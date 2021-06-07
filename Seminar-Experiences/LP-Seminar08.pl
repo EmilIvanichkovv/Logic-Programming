@@ -56,11 +56,11 @@ thirdAppendVersion(X,L):-myAppend([_,_],[X|_],L).
 lastAppendVersion(X,L):-myAppend(_,[X],L).
 memberAppendVersion(X, L):-myAppend(_, [X|_], L).
 
-% Index Function - Fixed !
+% Index Function - Fixed ! | Only gives element on index X in list L 
 myIndex([X|_], X,  0).
 myIndex([_|T], X, N):- N1 is N-1, myIndex(T, X, N1). 
 
-% Working Index Function form StackOverflow:
+% Working Index Function form StackOverflow: | Works in both scenarios ( with given Element or given Idnex)
 indexOf([Element|_], Element, 0). % We found the element
 indexOf([_|Tail], Element, Index):-
   indexOf(Tail, Element, Index1), % Check in the tail of the list
