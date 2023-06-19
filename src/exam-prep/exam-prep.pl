@@ -175,11 +175,11 @@ is_prime(P) :- not(( M #>= 2, M #< P, P #= M * N)).
 nat(N) :- N #= 0.
 nat(N) :- nat(N-1).
 
-upTo(1,[1]).
-upTo(Top, [Top|Res]):- Top #>=0, L #= Top - 1, upTo(L, Res).
-
 k6_plus_1(X) :- nat(N), X #= N*6+1, is_prime(X).
 k6_plus_5(X) :- nat(N), X #= N*6+5, is_prime(X).
+
+upTo(1,[1]).
+upTo(Top, [Top|Res]):- Top #>=0, L #= Top - 1, upTo(L, Res).
 
 epsilon(I, Count):- upTo(I, UpToI),
                     findall(
@@ -224,3 +224,65 @@ mu(X) :- upTo(X, Is),
                 ),
             Sats),
         len_m(Sats, Len), Len #> 0.
+
+% Danny, Task 2
+pair_n([A,B]) :- nat(N), A in 0..N, B in 0..N, label([A,B]).
+pair3_n([A,B,C]) :- nat(N), A in 0..N, B in 0..N, C in 0..N, label([A,B]).
+
+do(L, K, Res) :- findall(
+                    Sat,
+                    (
+                        member_m(Sat, L),
+                        Sat = [K,_]
+                    ),
+                    Sats),
+                len_m(Sats, Res).
+
+di(L, K, Res) :- findall(
+                    Sat,
+                    (
+                        member_m(Sat, L),
+                        Sat = [_,K]
+                    ),
+                    Sats),
+                len_m(Sats, Res).
+
+e1g(L):- pair_n(L),
+         do(L, 3, ResDo),
+         di(L, 3, ResDi),
+         Dif #= ResDo - ResDi,
+         abs_(Dif, Res),
+         Res #< 1.
+
+% Graphs
+vertex((VV, _EE), V) :- member_m(V, VV).
+vertex(G,V) :- member_m([V,_], G) ; member_m([_,V], G).
+
+edge((_VV, EE), U, V) :- member_m((U,V), EE).
+edge(G, U, V):- member_m([U,V], G).
+
+
+% Конкретни графи G1 и G2
+
+vertex(g1, a).  vertex(g1, b).  vertex(g1, c).  vertex(g1, d).
+vertex(g1, e).  vertex(g1, f).  vertex(g1, g).  vertex(g1, h).
+
+edge(g1, a, b).  edge(g1, a, c).  edge(g1, b, d).
+edge(g1, c, d).  edge(g1, c, e).  edge(g1, d, f).
+edge(g1, e, f).  edge(g1, e, g).  edge(g1, f, h).
+edge(g1, g, h).
+
+vertex(g2, a).  vertex(g2, b).  vertex(g2, c).  vertex(g2, d).
+vertex(g2, e).  vertex(g2, f).  vertex(g2, g).  vertex(g2, h).
+
+edge(g2, a, a).  edge(g2, a, e).  edge(g2, a, b).
+edge(g2, b, d).  edge(g2, c, b).  edge(g2, d, c).
+edge(g2, d, e).  edge(g2, e, f).  edge(g2, f, d).
+edge(g2, g, h).  edge(g2, g, e).  edge(g2, h, g).
+edge(g2, h, f).
+
+path(G, U, V, [U,V]) :- edge(G, U, V).
+path(G, U, V, [U|Res]) :- edge(G, U, R), path(G, R, V, Res).
+path_no_loop(G, U, V, Res) :- len_m(Res, N), path(G, U, V, Res).
+
+path_with_len(G, U, V, Len, Res) :- len_m(Res, Len), path(G, U, V, Res).
